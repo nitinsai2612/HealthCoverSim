@@ -1,0 +1,18 @@
+{
+  "name": "healthcoversim-server",
+  "version": "1.0.0",
+  "description": "HealthCoverSim backend - Express + SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "init-db": "node db.js",
+    "test": "node test/pricing.test.js",
+    "test:api": "node test/api.smoke.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7"
+  }
+}

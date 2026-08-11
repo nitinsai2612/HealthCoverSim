@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Database file (created by `npm run init-db`)
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment / logs
+.env
+*.log
+npm-debug.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,234 @@
+/* ==========================================================================
+   HealthCoverSim — basic CSS (no framework)
+   ========================================================================== */
+
+:root {
+  --ink: #1c2733;
+  --ink-soft: #5b6b7c;
+  --line: #d9e1e8;
+  --bg: #f4f7f9;
+  --panel: #ffffff;
+  --brand: #10618f;
+  --brand-dark: #0b4568;
+  --brand-soft: #e7f1f7;
+  --good: #1d7a4c;
+  --good-soft: #e6f5ed;
+  --warn: #8a5a00;
+  --warn-soft: #fdf3dd;
+  --bad: #b3261e;
+  --bad-soft: #fdeceb;
+  --radius: 8px;
+  --shadow: 0 1px 3px rgba(20, 40, 60, 0.08);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: var(--bg);
+}
+
+h1, h2, h3 { line-height: 1.25; }
+h2 { font-size: 1.35rem; margin: 0 0 0.25rem; }
+h3 { font-size: 1.05rem; margin: 1.75rem 0 0.5rem; }
+
+/* ---- Layout -------------------------------------------------------------- */
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+
+.header { background: var(--brand-dark); color: #fff; }
+.header__inner {
+  max-width: 1180px; margin: 0 auto; padding: 1.1rem 1.25rem;
+  display: flex; flex-wrap: wrap; gap: 1rem;
+  align-items: center; justify-content: space-between;
+}
+.header h1 { margin: 0; font-size: 1.5rem; letter-spacing: -0.01em; }
+.tagline { margin: 0.15rem 0 0; color: #b9d4e6; font-size: 0.9rem; }
+
+.nav { display: flex; gap: 0.5rem; }
+.nav__btn {
+  background: transparent; color: #d7e8f3;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  padding: 0.5rem 0.9rem; border-radius: var(--radius);
+  font-size: 0.95rem; cursor: pointer;
+}
+.nav__btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.nav__btn--active { background: #fff; color: var(--brand-dark); border-color: #fff; font-weight: 600; }
+
+.main { flex: 1; width: 100%; max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+
+.footer {
+  border-top: 1px solid var(--line); background: var(--panel);
+  padding: 1rem 1.25rem; color: var(--ink-soft); font-size: 0.85rem;
+}
+.footer p { max-width: 1180px; margin: 0 auto; }
+
+/* Two-column layouts collapse to one column on narrow screens. */
+.form-layout, .detail-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+@media (max-width: 950px) {
+  .form-layout, .detail-layout { grid-template-columns: 1fr; }
+}
+
+/* ---- Cards --------------------------------------------------------------- */
+
+.card, .sheet {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  padding: 1.25rem; margin-bottom: 1.25rem;
+}
+.card__header {
+  display: flex; flex-wrap: wrap; gap: 0.75rem;
+  align-items: center; justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+.card__intro { margin: 0 0 1rem; color: var(--ink-soft); font-size: 0.9rem; }
+.count { color: var(--ink-soft); font-weight: 400; font-size: 1rem; }
+.empty { color: var(--ink-soft); padding: 1.5rem 0; text-align: center; }
+
+/* ---- Forms --------------------------------------------------------------- */
+
+.group { border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1rem 0.25rem; margin: 0 0 1rem; }
+.group--conditional { border-color: var(--brand); background: var(--brand-soft); }
+.group legend { font-weight: 600; padding: 0 0.4rem; font-size: 0.95rem; }
+
+.badge {
+  display: inline-block; margin-left: 0.4rem; padding: 0.1rem 0.45rem;
+  background: var(--brand); color: #fff; border-radius: 999px;
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em;
+}
+
+.field { margin-bottom: 1rem; }
+.field__label { display: block; font-weight: 600; font-size: 0.92rem; margin-bottom: 0.3rem; }
+.field__required { color: var(--bad); }
+.field__input {
+  width: 100%; padding: 0.55rem 0.65rem; font: inherit; color: var(--ink);
+  background: #fff; border: 1px solid var(--line); border-radius: var(--radius);
+}
+.field__input:focus { outline: 2px solid var(--brand); outline-offset: 1px; border-color: var(--brand); }
+.field__input:disabled { background: #eef2f5; color: var(--ink-soft); cursor: not-allowed; }
+.field__input--textarea { resize: vertical; }
+.field__hint { margin: 0.3rem 0 0; font-size: 0.82rem; color: var(--ink-soft); }
+.field__error { margin: 0.3rem 0 0; font-size: 0.85rem; color: var(--bad); font-weight: 600; }
+.field--error .field__input { border-color: var(--bad); background: var(--bad-soft); }
+
+.radio-group { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.radio {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 0.8rem; border: 1px solid var(--line);
+  border-radius: var(--radius); background: #fff; cursor: pointer; font-size: 0.95rem;
+}
+.radio:hover { border-color: var(--brand); }
+.radio--selected { border-color: var(--brand); background: var(--brand-soft); font-weight: 600; }
+
+.actions { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.5rem; }
+
+/* ---- Buttons ------------------------------------------------------------- */
+
+.btn {
+  padding: 0.55rem 1rem; font: inherit; font-size: 0.92rem;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: #fff; color: var(--ink); cursor: pointer;
+}
+.btn:hover { border-color: var(--brand); color: var(--brand); }
+.btn:disabled { opacity: 0.6; cursor: not-allowed; }
+.btn--primary { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 600; }
+.btn--primary:hover { background: var(--brand-dark); border-color: var(--brand-dark); color: #fff; }
+.btn--danger { color: var(--bad); border-color: #eccbc9; }
+.btn--danger:hover { background: var(--bad); border-color: var(--bad); color: #fff; }
+.btn--small { padding: 0.3rem 0.6rem; font-size: 0.85rem; }
+
+.link {
+  background: none; border: none; padding: 0; font: inherit;
+  color: var(--brand); font-weight: 600; text-decoration: underline; cursor: pointer;
+}
+.link:hover { color: var(--brand-dark); }
+
+/* ---- Alerts -------------------------------------------------------------- */
+
+.alert { padding: 0.75rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; border: 1px solid; }
+.alert--error { background: var(--bad-soft); border-color: #f0c4c1; color: var(--bad); font-weight: 600; }
+.alert--success { background: var(--good-soft); border-color: #bfe3d0; color: var(--good); font-weight: 600; }
+
+.warning-box {
+  background: var(--warn-soft); border: 1px solid #f0dda9; border-left: 4px solid var(--warn);
+  border-radius: var(--radius); padding: 0.85rem 1rem; margin: 1rem 0; color: var(--warn);
+}
+.warning-box ul { margin: 0.4rem 0 0; padding-left: 1.2rem; }
+.warning-box li { margin-bottom: 0.25rem; }
+
+/* ---- Tables -------------------------------------------------------------- */
+
+.table-scroll { overflow-x: auto; }
+
+table.list, table.breakdown { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+table.list th, table.list td,
+table.breakdown th, table.breakdown td {
+  padding: 0.55rem 0.6rem; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top;
+}
+table.list thead th, table.breakdown thead th {
+  background: #eef3f7; font-size: 0.8rem; text-transform: uppercase;
+  letter-spacing: 0.03em; color: var(--ink-soft); border-bottom: 2px solid var(--line);
+}
+table.list tbody tr:hover { background: #f8fbfd; }
+.numeric { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+th[scope="row"] { font-weight: 600; }
+
+.breakdown tr.subtotal td, .breakdown tr.subtotal th { background: #f6f9fb; }
+.breakdown tr.total td, .breakdown tr.total th {
+  background: var(--brand-soft); font-weight: 700; border-top: 2px solid var(--brand); border-bottom: none;
+}
+
+.row-actions { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.muted { color: var(--ink-soft); font-size: 0.88em; }
+
+.pill {
+  display: inline-block; margin-left: 0.4rem; width: 1.15rem; height: 1.15rem;
+  line-height: 1.15rem; text-align: center; border-radius: 50%;
+  font-size: 0.75rem; font-weight: 700;
+}
+.pill--warn { background: var(--warn-soft); color: var(--warn); border: 1px solid #f0dda9; }
+
+/* ---- Explanation sheet --------------------------------------------------- */
+
+.estimates { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; margin: 1rem 0 0.5rem; }
+.estimate {
+  border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0.8rem 0.9rem; background: #fbfdfe; display: flex; flex-direction: column; gap: 0.15rem;
+}
+.estimate--highlight { border-color: var(--good); background: var(--good-soft); }
+.estimate--muted { background: #f4f6f8; color: var(--ink-soft); }
+.estimate__label { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--ink-soft); }
+.estimate__value { font-size: 1.5rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.estimate__note { font-size: 0.8rem; color: var(--ink-soft); }
+
+.statement {
+  margin: 0.75rem 0 0; padding: 0.7rem 0.9rem;
+  background: var(--brand-soft); border-left: 4px solid var(--brand);
+  border-radius: var(--radius); font-weight: 600; font-size: 0.92rem;
+}
+
+.plain { margin: 0 0 0.7rem; font-size: 0.95rem; }
+
+.final-total {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  align-items: baseline; justify-content: space-between;
+  margin-top: 1.25rem; padding: 0.9rem 1rem;
+  background: var(--brand-dark); color: #fff; border-radius: var(--radius);
+}
+.final-total span { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; color: #c5dcea; }
+.final-total strong { font-size: 1.6rem; font-variant-numeric: tabular-nums; }
+
+.disclaimer { margin: 0.9rem 0 0; font-size: 0.82rem; color: var(--ink-soft); font-style: italic; }
+
+.preview__empty { color: var(--ink-soft); }
+
+/* ---- Accessibility helper ------------------------------------------------ */
+
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
