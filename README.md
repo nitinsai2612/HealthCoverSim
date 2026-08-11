@@ -82,19 +82,96 @@ npm test           # 50 unit tests for the pricing engine - no server needed
 npm run test:api   # 63 end-to-end API tests, including every marker edge case
 ```
 
-### Troubleshooting
+### Hard problems in this project, and how they are solved
+
+These are the traps in the quote logic. Each one produces a plausible-looking but wrong
+number rather than an obvious crash, which is what makes them worth documenting. Every one
+of them is covered by a test in `server/test/pricing.test.js`.
+
+**1. Floating point makes money wrong by a fraction of a cent**
+
+The Section 7 example happens to divide cleanly, so it hides this problem. Most other
+inputs do not. A 33-year-old with no prior cover on Silver hospital and Standard extras,
+paying yearly with a 3% discount, produces this chain in raw JavaScript:
+
+```
+160 * 1.06        = 169.60000000000002
+169.6 + 45        = 214.60000000000002
+214.6 * 12        = 2575.2000000000003
+2575.2 * 0.97     = 2497.9440000000004
+```
+
+Rendered directly, that is a premium of `$2575.2000000000003`. Sweeping the whole valid
+input space (every cover tier, every age from 31 to 100, both adult counts, every discount
+step) throws up over a hundred thousand combinations that drift like this. Every monetary
+value is therefore passed through `round2()`, which adds `Number.EPSILON` before rounding
+so values sitting on a midpoint round the way a person expects rather than the way binary
+floating point does:
+
+```js
+Math.round((value + Number.EPSILON) * 100) / 100
+```
+
+**2. Applying LHC loading to the hospital total instead of per applicant**
+
+The tempting shortcut is to total the hospital cover first and then apply one loading to
+it. That is correct for Single cover and silently wrong for Couple and Family, because the
+two adults usually have different loadings. In the Section 7 example the shortcut gives
+`$320 x 1.20 = $384` instead of the correct `$192 + $160 = $352`, a $32 per month error
+that still looks like a reasonable premium. The loop in `pricing.js` therefore prices each
+applicant individually and sums afterwards.
+
+**3. The `age > 30` boundary is off by one if you write `>=`**
+
+The rule is `(age - 30) x 2%`. Writing `age >= 30` still returns 0% for a 30-year-old, so
+the bug is invisible at the boundary itself and only appears as a wrong multiplier further
+up the range. Tests pin ages 29, 30 and 31 explicitly.
+
+**4. Loading leaking onto extras, or onto a quote with no hospital cover**
+
+Extras cover must never be loaded, and an applicant with no hospital cover has nothing to
+load even if they are 60 with no cover history. `calculateLhcLoading()` returns 0
+immediately when `hospitalCover === 'None'`, and is only ever called from the hospital
+branch of the calculation. A test asserts that the extras total is identical whether or not
+the hospital premium is loaded.
+
+**5. The annual discount surviving a switch to monthly**
+
+The discount is stored on the record, so a quote edited from Yearly to Monthly still has a
+discount value in the database. If the calculation reads that value unconditionally, a
+monthly payer gets a discount they are not entitled to. The engine forces
+`discountPercent` to 0 and `yearlyAfterDiscount` to `null` whenever the frequency is not
+Yearly, and the UI disables the field rather than hiding it, so the stored value stays
+visible and explainable.
+
+**6. Applicant 2 fields going stale when cover type changes**
+
+Switching from Family back to Single leaves applicant 2 values in React state. If those
+were saved, a Single quote would carry a phantom second adult. `normaliseQuote()` writes
+`NULL` into both applicant 2 columns for Single cover, the database enforces this with a
+`CHECK` constraint, and `calculateQuote()` only ever loops over the adult count for the
+selected cover type.
+
+**7. Two copies of the pricing logic drifting apart**
+
+The obvious way to build the live estimate on the form is to calculate it in the browser.
+That immediately creates a second implementation which can disagree with the backend after
+any change. Instead the form posts to `POST /api/quotes/preview`, which runs the same
+`pricing.js` used by the detail page and returns the breakdown without saving anything.
+There is exactly one implementation of the pricing rules in the project.
+
+### Runtime problems
 
 | Problem | Fix |
 |---|---|
-| `The token '&&' is not a valid statement separator` | Windows PowerShell 5.1. Run each command on its own line, or use `;` instead of `&&`. |
-| `Cannot find module 'express'` | You skipped `npm install`, or you are in the wrong folder. `npm install` must be run **twice** - once in `server/` and once in `client/`. |
-| `EADDRINUSE: address already in use :::4000` | Another copy of the backend is still running. Close the other terminal, or set a different port: `$env:PORT=4001; npm start` (PowerShell). |
-| `Could not reach the server` in the browser | The backend is not running. Start Terminal 1 first, then reload the React app. |
 | `no such table: quotes` | Run `npm run init-db` in `server/`. |
-| `npm install` fails while building `sqlite3` | The `sqlite3` package compiles a small native module. On Windows this normally uses a prebuilt binary and needs no setup; if it fails, check you are on Node.js 18+ and that you have a working internet connection. |
+| `EADDRINUSE: address already in use :::4000` | A backend is already running. Close the other terminal, or use another port: `$env:PORT=4001; npm start`. |
+| `Could not reach the server` in the browser | The backend is not running, or it is on a different port from the one `client/vite.config.js` proxies to. |
+| `npm install` fails building `sqlite3` | `sqlite3` compiles a native module. It normally downloads a prebuilt binary; if that fails, check you are on Node.js 18+ with a working internet connection. |
+| Quote figures look stale after editing | The detail page recalculates from the stored inputs on every load, so a hard refresh should always show current figures. If it does not, the backend is serving a cached response from an old process. |
 
-> Note: `npm run init-db` **drops and recreates** the table, which deletes any quotes you
-> have saved. Run it once at the start; you do not need it again unless you want to reset.
+> `npm run init-db` **drops and recreates** the table, deleting any saved quotes. Run it
+> once at the start. You do not need it again unless you want to reset the data.
 
 ---
 
