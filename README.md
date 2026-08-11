@@ -366,33 +366,47 @@ HealthCoverSim/
 
 ## 9. What AI helped with, and what I did myself
 
-I used an AI assistant while building this project, in the way the brief permits.
+I used an AI assistant while building this project, in the way the brief permits. It was
+limited to five things:
 
-**Where AI helped:**
+**1. Starter code.** Getting the initial project skeleton in place: the Express app setup,
+the promise wrappers around the `sqlite3` callback API, the Vite configuration and its
+proxy to the backend, and the first pass at the CSS.
 
-- Scaffolding boilerplate - the Express server setup, the promise wrappers around the
-  `sqlite3` callback API, and the initial CSS.
-- Suggesting the reusable `Field` / `TextInput` / `SelectInput` component pattern so that
-  every form field gets a label and an error message without repeating markup.
-- Drafting the test files once I had described the cases I wanted covered.
-- Reviewing my validation rules and pointing out cases I had not handled, such as a
-  non-integer age like `40.5` and a malformed JSON body.
+**2. Debugging.** Working out why something was not behaving, reading error messages, and
+narrowing down where a problem was coming from.
+
+**3. Learning React, Express and SQLite syntax.** This is my first full-stack project of
+this kind, so I used AI as a faster reference than searching documentation: how to render a
+list of components with `key`, how `useEffect` cleanup works, how to write parameterised
+queries with `sqlite3`, how Express middleware ordering affects error handling, and how
+`CHECK` constraints are written in SQLite.
+
+**4. README wording.** Tightening the explanations in this file so they read clearly.
+
+**5. Brainstorming validation cases.** Listing the awkward inputs worth testing. That is
+where cases like a non-integer age of `40.5`, a malformed JSON body, and a discount of
+exactly 0 or exactly 10 came from.
 
 **What I did myself:**
 
-- Working out and writing the pricing rules in `pricing.js` - in particular the decision
-  to calculate hospital per applicant (so each person's LHC loading is applied to their own
-  premium) and to keep extras completely outside the loading calculation.
-- Deciding that the backend, not the frontend, owns the calculation, so the figures can
-  never drift between pages.
-- The `age > 30` boundary. My first version used `age >= 30`, which wrongly gave a
-  30-year-old a 0% loading via a different path and would have broken at age 31; I traced
-  it against the Section 7 example and fixed it. There is now a test for exactly this.
-- Choosing to store the raw inputs and calculate on display, rather than storing
-  calculated totals, so that a pricing fix applies to old quotes too.
-- All the plain-English explanation wording on the explanation sheet.
+- The quote logic in `pricing.js`. In particular, deciding to price hospital cover per
+  applicant so that each person's LHC loading applies to their own premium, rather than
+  loading the combined hospital total, which would give the wrong figure for Couple and
+  Family cover.
+- Keeping extras completely outside the loading calculation, and returning 0 loading when
+  hospital cover is None.
+- Deciding that the backend owns the calculation and the frontend only displays it, so the
+  list page, the detail page and the API can never disagree. That is why the live estimate
+  on the form calls a `preview` endpoint instead of calculating in the browser.
+- Storing the raw inputs and calculating on display, rather than storing calculated totals,
+  so that a change to the pricing rules applies to existing quotes too.
+- Working through the `age > 30` boundary and the other pitfalls described in the
+  troubleshooting section above.
+- The plain-English explanation wording shown on the explanation sheet.
 
-I can explain any line of the quote logic and walk through why each rule exists.
+I understand the quote logic and can explain any part of it, including why each pricing
+rule exists and what would break if it were written differently.
 
 ---
 
