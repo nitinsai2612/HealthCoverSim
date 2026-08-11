@@ -1,5 +1,5 @@
 /*
- * pricing.test.js — unit tests for the quote calculation engine.
+ * pricing.test.js - unit tests for the quote calculation engine.
  * Run with:  npm test        (no server or database required)
  *
  * The Section 7 worked example is the primary verification tool:
@@ -144,7 +144,7 @@ test('Family -> 2 adults + $30 fee, applied exactly once', () => {
   assert.strictEqual(r.monthlyPremium, 90 * 2 + 25 * 2 + 30);
 });
 
-test('There is no couple/family discount — Couple is exactly 2x Single', () => {
+test('There is no couple/family discount - Couple is exactly 2x Single', () => {
   const single = calculateQuote(quote({ cover_type: 'Single', applicant1_cover_history: 'Yes', hospital_cover: 'Gold', extras_cover: 'Premium' }));
   const couple = calculateQuote(quote({ cover_type: 'Couple', applicant1_cover_history: 'Yes', applicant2_age: 40, applicant2_cover_history: 'Yes', hospital_cover: 'Gold', extras_cover: 'Premium' }));
   assert.strictEqual(couple.monthlyPremium, single.monthlyPremium * 2);
@@ -229,7 +229,7 @@ test('Warning text matches the wording in the brief', () => {
   const r = calculateQuote(quote({ applicant1_cover_history: 'Not sure' }));
   assert.strictEqual(
     r.warnings[0],
-    'Applicant 1: Cover history is unknown — LHC loading has not been applied. This quote may be inaccurate.'
+    'Applicant 1: Cover history is unknown. LHC loading has not been applied. This quote may be inaccurate.'
   );
 });
 

@@ -1,11 +1,3 @@
-/*
- * App.jsx — the whole application shell.
- *
- * Navigation is handled with plain React state (a `view` value) rather than a
- * routing library, using only the React concepts covered up to Week 4:
- * components, props, useState, useEffect and conditional rendering.
- */
-
 import { useCallback, useEffect, useState } from 'react';
 import QuoteList from './components/QuoteList.jsx';
 import QuoteForm from './components/QuoteForm.jsx';
@@ -15,7 +7,6 @@ import { EMPTY_QUOTE } from './constants.js';
 import { toFormValues } from './validation.js';
 
 export default function App() {
-  // 'list' | 'create' | 'detail' | 'edit'
   const [view, setView] = useState('list');
   const [selectedId, setSelectedId] = useState(null);
 
@@ -31,7 +22,7 @@ export default function App() {
   const [submitFieldErrors, setSubmitFieldErrors] = useState({});
   const [flash, setFlash] = useState('');
 
-  // ---- Data loading ------------------------------------------------------
+  // Data loading
 
   const loadQuotes = useCallback(async () => {
     setListLoading(true);
@@ -47,7 +38,6 @@ export default function App() {
 
   useEffect(() => { loadQuotes(); }, [loadQuotes]);
 
-  // Load one quote whenever the detail or edit page is opened.
   useEffect(() => {
     if ((view !== 'detail' && view !== 'edit') || selectedId === null) return;
     let cancelled = false;
@@ -60,14 +50,13 @@ export default function App() {
     return () => { cancelled = true; };
   }, [view, selectedId]);
 
-  // Clear the success message after a few seconds.
   useEffect(() => {
     if (!flash) return undefined;
     const timer = setTimeout(() => setFlash(''), 4000);
     return () => clearTimeout(timer);
   }, [flash]);
 
-  // ---- Navigation helpers ------------------------------------------------
+  // Navigation helpers
 
   const clearSubmitErrors = () => { setSubmitError(''); setSubmitFieldErrors({}); };
 
@@ -76,7 +65,7 @@ export default function App() {
   const goDetail = (id) => { setView('detail'); setSelectedId(id); clearSubmitErrors(); };
   const goEdit = (id) => { setView('edit'); setSelectedId(id); clearSubmitErrors(); };
 
-  // ---- Actions -----------------------------------------------------------
+  // Actions
 
   const handleCreate = async (payload) => {
     clearSubmitErrors();
@@ -117,7 +106,7 @@ export default function App() {
     }
   };
 
-  // ---- Render ------------------------------------------------------------
+  // Render
 
   return (
     <div className="app">
@@ -179,7 +168,7 @@ export default function App() {
 
         {view === 'edit' && (
           detailLoading ? (
-            <div className="card"><p>Loading quote…</p></div>
+            <div className="card"><p>Loading quote...</p></div>
           ) : detailError ? (
             <div className="card">
               <div className="alert alert--error" role="alert">{detailError}</div>
@@ -188,7 +177,6 @@ export default function App() {
           ) : current ? (
             <QuoteForm
               mode="edit"
-              // `key` forces a fresh form when a different quote is opened.
               key={current.quote.id}
               initialValues={toFormValues(current.quote)}
               onSubmit={handleUpdate}
@@ -202,7 +190,7 @@ export default function App() {
 
       <footer className="footer">
         <p>
-          HealthCoverSim — CSE3CWA / CSE5006 Assignment 1. A learning simulator only:
+          HealthCoverSim - CSE3CWA / CSE5006 Assignment 1. A learning simulator only:
           not financial advice, and not the pricing of any real insurer.
         </p>
       </footer>

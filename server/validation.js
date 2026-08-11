@@ -1,11 +1,3 @@
-/*
- * validation.js — shared validation rules (Assignment Section 9)
- * --------------------------------------------------------------
- * Used by the Express API so that invalid data sent straight to the
- * backend returns a meaningful 400 error, never a 500 crash.
- * The React form mirrors these same rules on the client side.
- */
-
 const COVER_TYPES = ['Single', 'Couple', 'Family'];
 const HOSPITAL_LEVELS = ['None', 'Basic', 'Bronze', 'Silver', 'Gold'];
 const EXTRAS_LEVELS = ['None', 'Basic', 'Standard', 'Premium'];
@@ -17,22 +9,17 @@ const MAX_AGE = 100;
 const MIN_DISCOUNT = 0;
 const MAX_DISCOUNT = 10;
 
-/** True when a value is a whole number within [min, max]. */
 function isWholeNumberInRange(value, min, max) {
   if (value === null || value === undefined || value === '') return false;
   const n = Number(value);
   return Number.isFinite(n) && Number.isInteger(n) && n >= min && n <= max;
 }
 
-/**
- * Validate a quote payload.
- * @returns {{ valid: boolean, errors: object }} errors keyed by field name
- */
 function validateQuote(body) {
   const errors = {};
   const data = body && typeof body === 'object' ? body : {};
 
-  // --- Customer name ------------------------------------------------------
+  // Customer name
   const name = typeof data.customer_name === 'string' ? data.customer_name.trim() : '';
   if (!name) {
     errors.customer_name = 'Customer name is required.';
@@ -40,12 +27,12 @@ function validateQuote(body) {
     errors.customer_name = 'Customer name must be 100 characters or fewer.';
   }
 
-  // --- Cover type ---------------------------------------------------------
+  // Cover type
   if (!COVER_TYPES.includes(data.cover_type)) {
     errors.cover_type = `Cover type is required and must be one of: ${COVER_TYPES.join(', ')}.`;
   }
 
-  // --- Cover selections ---------------------------------------------------
+  // Cover selections
   if (!HOSPITAL_LEVELS.includes(data.hospital_cover)) {
     errors.hospital_cover = `Hospital cover level is required and must be one of: ${HOSPITAL_LEVELS.join(', ')}.`;
   }
@@ -53,7 +40,7 @@ function validateQuote(body) {
     errors.extras_cover = `Extras cover level is required and must be one of: ${EXTRAS_LEVELS.join(', ')}.`;
   }
 
-  // --- Applicant 1 (always required) --------------------------------------
+  // Applicant 1 (always required)
   if (!isWholeNumberInRange(data.applicant1_age, MIN_AGE, MAX_AGE)) {
     errors.applicant1_age = `Applicant 1 age is required and must be a whole number between ${MIN_AGE} and ${MAX_AGE}.`;
   }
@@ -61,7 +48,7 @@ function validateQuote(body) {
     errors.applicant1_cover_history = `Applicant 1 hospital cover history is required (${COVER_HISTORIES.join(' / ')}).`;
   }
 
-  // --- Applicant 2 (required ONLY for Couple / Family) --------------------
+  // Applicant 2 (required ONLY for Couple / Family)
   const needsApplicant2 = data.cover_type === 'Couple' || data.cover_type === 'Family';
   if (needsApplicant2) {
     if (!isWholeNumberInRange(data.applicant2_age, MIN_AGE, MAX_AGE)) {
@@ -72,12 +59,12 @@ function validateQuote(body) {
     }
   }
 
-  // --- Payment frequency --------------------------------------------------
+  // Payment frequency
   if (!PAYMENT_FREQUENCIES.includes(data.payment_frequency)) {
     errors.payment_frequency = `Payment frequency is required and must be one of: ${PAYMENT_FREQUENCIES.join(', ')}.`;
   }
 
-  // --- Annual discount ----------------------------------------------------
+  // Annual discount
   const discountProvided =
     data.annual_discount !== undefined && data.annual_discount !== null && data.annual_discount !== '';
   if (discountProvided) {
@@ -86,10 +73,10 @@ function validateQuote(body) {
       errors.annual_discount = `Annual discount must be a number between ${MIN_DISCOUNT}% and ${MAX_DISCOUNT}%.`;
     }
   } else if (data.payment_frequency === 'Yearly') {
-    errors.annual_discount = `Annual discount is required when paying Yearly (${MIN_DISCOUNT}–${MAX_DISCOUNT}%). Enter 0 for no discount.`;
+    errors.annual_discount = `Annual discount is required when paying Yearly (${MIN_DISCOUNT}-${MAX_DISCOUNT}%). Enter 0 for no discount.`;
   }
 
-  // --- Notes (optional) ---------------------------------------------------
+  // Notes (optional)
   if (data.notes !== undefined && data.notes !== null && typeof data.notes !== 'string') {
     errors.notes = 'Notes must be text.';
   } else if (typeof data.notes === 'string' && data.notes.length > 500) {
@@ -99,10 +86,6 @@ function validateQuote(body) {
   return { valid: Object.keys(errors).length === 0, errors };
 }
 
-/**
- * Normalise a validated payload into the exact shape stored in SQLite.
- * Applicant 2 columns are set to NULL for Single cover.
- */
 function normaliseQuote(data) {
   const needsApplicant2 = data.cover_type === 'Couple' || data.cover_type === 'Family';
   return {

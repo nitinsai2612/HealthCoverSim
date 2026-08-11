@@ -1,20 +1,3 @@
-/*
- * server.js — HealthCoverSim REST API (Node.js + Express + SQLite)
- * ----------------------------------------------------------------
- * Endpoints
- *   GET    /api/health         health check
- *   GET    /api/options        dropdown options + price tables (drives the React form)
- *   GET    /api/quotes         list all quotes (with monthly premium for each)
- *   GET    /api/quotes/:id     one quote + full calculated breakdown
- *   POST   /api/quotes         create
- *   PUT    /api/quotes/:id     update
- *   DELETE /api/quotes/:id     delete
- *   POST   /api/quotes/preview calculate without saving
- *
- * Every route validates its input and returns a meaningful 400 error
- * rather than crashing with a 500.
- */
-
 const express = require('express');
 const cors = require('cors');
 
@@ -40,7 +23,6 @@ const PORT = process.env.PORT || 4000;
 app.use(cors());
 app.use(express.json());
 
-// Reject malformed JSON bodies with 400 instead of letting Express throw a 500.
 app.use((err, req, res, next) => {
   if (err instanceof SyntaxError && 'body' in err) {
     return res.status(400).json({ error: 'Request body is not valid JSON.' });
@@ -48,9 +30,8 @@ app.use((err, req, res, next) => {
   return next(err);
 });
 
-// ---- Helpers -------------------------------------------------------------
+// Helpers
 
-/** Parse and validate an :id route parameter. */
 function parseId(rawId) {
   const id = Number(rawId);
   if (!Number.isInteger(id) || id < 1) return null;
@@ -65,13 +46,12 @@ const SELECT_COLUMNS = `
   annual_discount, notes, created_at
 `;
 
-// ---- Routes --------------------------------------------------------------
+// Routes
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'HealthCoverSim API' });
 });
 
-// Options + price tables, so the React form never hard-codes prices twice.
 app.get('/api/options', (req, res) => {
   res.json({
     coverTypes: COVER_TYPES,
@@ -91,7 +71,6 @@ app.get('/api/options', (req, res) => {
   });
 });
 
-// LIST — every quote, newest first, with its monthly premium for the summary table.
 app.get('/api/quotes', async (req, res) => {
   try {
     const rows = await all(`SELECT ${SELECT_COLUMNS} FROM quotes ORDER BY id DESC`);
@@ -112,7 +91,6 @@ app.get('/api/quotes', async (req, res) => {
   }
 });
 
-// PREVIEW — calculate without saving (used by the live preview on the form).
 app.post('/api/quotes/preview', (req, res) => {
   const { valid, errors } = validateQuote(req.body);
   if (!valid) {
@@ -122,7 +100,6 @@ app.post('/api/quotes/preview', (req, res) => {
   return res.json({ quote, breakdown: calculateQuote(quote) });
 });
 
-// DETAIL — one quote plus the full explanation-sheet breakdown.
 app.get('/api/quotes/:id', async (req, res) => {
   const id = parseId(req.params.id);
   if (id === null) {
@@ -138,7 +115,6 @@ app.get('/api/quotes/:id', async (req, res) => {
   }
 });
 
-// CREATE
 app.post('/api/quotes', async (req, res) => {
   const { valid, errors } = validateQuote(req.body);
   if (!valid) {
@@ -170,7 +146,6 @@ app.post('/api/quotes', async (req, res) => {
   }
 });
 
-// UPDATE
 app.put('/api/quotes/:id', async (req, res) => {
   const id = parseId(req.params.id);
   if (id === null) {
@@ -210,7 +185,6 @@ app.put('/api/quotes/:id', async (req, res) => {
   }
 });
 
-// DELETE
 app.delete('/api/quotes/:id', async (req, res) => {
   const id = parseId(req.params.id);
   if (id === null) {
@@ -226,18 +200,16 @@ app.delete('/api/quotes/:id', async (req, res) => {
   }
 });
 
-// Unknown API route
 app.use('/api', (req, res) => {
   res.status(404).json({ error: `Unknown API endpoint: ${req.method} ${req.originalUrl}` });
 });
 
-// Catch-all error handler — guarantees a JSON error instead of an HTML crash page.
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.error('Unhandled error:', err);
   res.status(500).json({ error: 'Unexpected server error.' });
 });
 
-// ---- Start ---------------------------------------------------------------
+// Start
 if (require.main === module) {
   ensureDatabaseReady((err) => {
     if (err) {

@@ -1,10 +1,3 @@
-/*
- * ExplanationSheet.jsx — the plain-English premium breakdown (Assignment Section 8).
- * Shows: monthly and yearly estimates, hospital and extras as separate line items,
- * each applicant's LHC loading %, the family fee, warnings, the required LHC
- * statement, and a short explanation of how the quote was calculated.
- */
-
 import { formatMoney } from '../constants.js';
 
 export default function ExplanationSheet({ breakdown }) {
@@ -24,7 +17,6 @@ export default function ExplanationSheet({ breakdown }) {
     <section className="sheet" aria-label="Quote explanation sheet">
       <h2>Explanation sheet</h2>
 
-      {/* ---- Headline estimates: monthly AND yearly, always both ---------- */}
       <div className="estimates">
         <div className="estimate">
           <span className="estimate__label">Estimated monthly premium</span>
@@ -34,7 +26,7 @@ export default function ExplanationSheet({ breakdown }) {
         <div className="estimate">
           <span className="estimate__label">Yearly premium before discount</span>
           <span className="estimate__value">{formatMoney(yearlyBeforeDiscount)}</span>
-          <span className="estimate__note">{formatMoney(monthlyPremium)} × 12 months</span>
+          <span className="estimate__note">{formatMoney(monthlyPremium)} x 12 months</span>
         </div>
         {isYearly ? (
           <div className="estimate estimate--highlight">
@@ -51,7 +43,6 @@ export default function ExplanationSheet({ breakdown }) {
         )}
       </div>
 
-      {/* ---- Warnings ---------------------------------------------------- */}
       {warnings.length > 0 && (
         <div className="warning-box" role="alert">
           <strong>Please note</strong>
@@ -61,7 +52,6 @@ export default function ExplanationSheet({ breakdown }) {
         </div>
       )}
 
-      {/* ---- Line-by-line breakdown -------------------------------------- */}
       <h3>How this quote is built</h3>
       <table className="breakdown">
         <caption className="visually-hidden">Premium breakdown by line item</caption>
@@ -73,17 +63,16 @@ export default function ExplanationSheet({ breakdown }) {
           </tr>
         </thead>
         <tbody>
-          {/* Hospital: one row per applicant, so each loading is visible */}
           {applicants.map((a) => (
             <tr key={`hospital-${a.applicant}`}>
-              <th scope="row">Hospital — Applicant {a.applicant}</th>
+              <th scope="row">Hospital - Applicant {a.applicant}</th>
               <td>
                 {hospitalCover === 'None' ? (
                   <>No hospital cover selected</>
                 ) : (
                   <>
                     {hospitalCover} at {formatMoney(hospitalBasePricePerAdult)}
-                    {' '}× (1 + {a.lhcLoadingPercent}% LHC loading)
+                    {' '}x (1 + {a.lhcLoadingPercent}% LHC loading)
                   </>
                 )}
                 <span className="muted"> · age {a.age}, prior cover: {a.coverHistory}</span>
@@ -97,23 +86,21 @@ export default function ExplanationSheet({ breakdown }) {
             <td className="numeric">{formatMoney(hospitalTotal)}</td>
           </tr>
 
-          {/* Extras: separate line item, never loaded */}
           <tr>
             <th scope="row">Extras premium</th>
             <td>
               {extrasCover === 'None'
                 ? 'No extras cover selected'
-                : <>{extrasCover} at {formatMoney(extrasBasePricePerAdult)} × {adultCount} adult{adultCount > 1 ? 's' : ''}</>}
+                : <>{extrasCover} at {formatMoney(extrasBasePricePerAdult)} x {adultCount} adult{adultCount > 1 ? 's' : ''}</>}
               <span className="muted"> · no LHC loading applied</span>
             </td>
             <td className="numeric">{formatMoney(extrasTotal)}</td>
           </tr>
 
-          {/* Family upgrade fee, only when relevant */}
           {coverType === 'Family' && (
             <tr>
               <th scope="row">Family upgrade fee</th>
-              <td>Flat add-on for Family cover — covers dependent children</td>
+              <td>Flat add-on for Family cover - covers dependent children</td>
               <td className="numeric">{formatMoney(familyUpgradeFee)}</td>
             </tr>
           )}
@@ -126,13 +113,12 @@ export default function ExplanationSheet({ breakdown }) {
         </tbody>
       </table>
 
-      {/* ---- Yearly section --------------------------------------------- */}
       <h3>Yearly figures</h3>
       <table className="breakdown">
         <tbody>
           <tr>
             <th scope="row">Yearly before discount</th>
-            <td>{formatMoney(monthlyPremium)} × 12</td>
+            <td>{formatMoney(monthlyPremium)} x 12</td>
             <td className="numeric">{formatMoney(yearlyBeforeDiscount)}</td>
           </tr>
           {isYearly ? (
@@ -144,7 +130,7 @@ export default function ExplanationSheet({ breakdown }) {
               </tr>
               <tr className="total">
                 <th scope="row">Yearly after discount</th>
-                <td>{formatMoney(yearlyBeforeDiscount)} × (1 − {annualDiscountPercent / 100})</td>
+                <td>{formatMoney(yearlyBeforeDiscount)} x (1 − {annualDiscountPercent / 100})</td>
                 <td className="numeric">{formatMoney(yearlyAfterDiscount)}</td>
               </tr>
             </>
@@ -152,7 +138,7 @@ export default function ExplanationSheet({ breakdown }) {
             <tr>
               <th scope="row">Annual-payment discount</th>
               <td colSpan={2}>
-                Not applied — this customer pays <strong>Monthly</strong>. The discount is only
+                Not applied - this customer pays <strong>Monthly</strong>. The discount is only
                 available when paying yearly.
               </td>
             </tr>
@@ -160,7 +146,6 @@ export default function ExplanationSheet({ breakdown }) {
         </tbody>
       </table>
 
-      {/* ---- Per-applicant LHC loading summary --------------------------- */}
       <h3>Lifetime Health Cover (LHC) loading</h3>
       <table className="breakdown">
         <thead>
@@ -184,7 +169,6 @@ export default function ExplanationSheet({ breakdown }) {
       </table>
       <p className="statement">{lhcStatement}</p>
 
-      {/* ---- Plain-English explanation ----------------------------------- */}
       <h3>In plain English</h3>
       <p className="plain">
         This is a <strong>{coverType}</strong> policy, so we price{' '}
@@ -222,7 +206,7 @@ export default function ExplanationSheet({ breakdown }) {
 
       <p className="disclaimer">
         This is a learning simulator only. It is not financial advice and does not reflect any real
-        insurer’s pricing.
+        insurer's pricing.
       </p>
     </section>
   );

@@ -1,9 +1,3 @@
-/*
- * FormField.jsx — reusable form controls (Week 4: reusable components).
- * Every field gets a <label>, the right input type, and an inline error message.
- */
-
-/** Wraps any control with its label, hint and error message. */
 export function Field({ label, htmlFor, error, hint, required, children }) {
   return (
     <div className={`field ${error ? 'field--error' : ''}`}>
@@ -18,7 +12,6 @@ export function Field({ label, htmlFor, error, hint, required, children }) {
   );
 }
 
-/** Single-line text input. */
 export function TextInput({ id, value, onChange, error, ...rest }) {
   return (
     <input
@@ -34,7 +27,6 @@ export function TextInput({ id, value, onChange, error, ...rest }) {
   );
 }
 
-/** Number input with min/max/step so the browser helps too. */
 export function NumberInput({ id, value, onChange, error, min, max, step = 1, ...rest }) {
   return (
     <input
@@ -53,8 +45,7 @@ export function NumberInput({ id, value, onChange, error, min, max, step = 1, ..
   );
 }
 
-/** Dropdown built from an array of options (strings, or {value,label} objects). */
-export function SelectInput({ id, value, onChange, options, error, placeholder = 'Please choose…' }) {
+export function SelectInput({ id, value, onChange, options, error, placeholder = 'Please choose...' }) {
   return (
     <select
       id={id}
@@ -78,7 +69,6 @@ export function SelectInput({ id, value, onChange, options, error, placeholder =
   );
 }
 
-/** Radio group — used for the small either/or choices. */
 export function RadioGroup({ id, value, onChange, options }) {
   return (
     <div className="radio-group" role="radiogroup" aria-labelledby={`${id}-label`}>
@@ -98,7 +88,6 @@ export function RadioGroup({ id, value, onChange, options }) {
   );
 }
 
-/** Multi-line notes field. */
 export function TextArea({ id, value, onChange, rows = 3, ...rest }) {
   return (
     <textarea

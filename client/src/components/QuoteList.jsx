@@ -1,11 +1,7 @@
-/*
- * QuoteList.jsx — the list page: every saved quote with its monthly premium.
- */
-
 import { formatMoney } from '../constants.js';
 
 export default function QuoteList({ quotes, loading, error, onView, onEdit, onDelete, onCreate, onRetry }) {
-  if (loading) return <div className="card"><p>Loading quotes…</p></div>;
+  if (loading) return <div className="card"><p>Loading quotes...</p></div>;
 
   if (error) {
     return (

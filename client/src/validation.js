@@ -1,8 +1,3 @@
-/*
- * validation.js (frontend) — mirrors the backend rules in server/validation.js
- * so the user is told what is wrong before anything is sent.
- */
-
 import { COVER_TYPES, HOSPITAL_LEVELS, EXTRAS_LEVELS, COVER_HISTORIES, PAYMENT_FREQUENCIES, MIN_AGE, MAX_AGE, MIN_DISCOUNT, MAX_DISCOUNT, needsApplicant2 } from './constants.js';
 
 const isWholeNumberInRange = (value, min, max) => {
@@ -11,9 +6,6 @@ const isWholeNumberInRange = (value, min, max) => {
   return Number.isFinite(n) && Number.isInteger(n) && n >= min && n <= max;
 };
 
-/**
- * @returns {object} errors keyed by field name — empty object means valid.
- */
 export function validateQuoteForm(values) {
   const errors = {};
 
@@ -31,13 +23,12 @@ export function validateQuoteForm(values) {
     errors.applicant1_age = `Enter a whole number between ${MIN_AGE} and ${MAX_AGE}.`;
   }
   if (!COVER_HISTORIES.includes(values.applicant1_cover_history)) {
-    errors.applicant1_cover_history = 'Please choose Applicant 1’s hospital cover history.';
+    errors.applicant1_cover_history = "Please choose Applicant 1's hospital cover history.";
   }
 
-  // Applicant 2 is only required for Couple and Family cover.
   if (needsApplicant2(values.cover_type)) {
     if (!isWholeNumberInRange(values.applicant2_age, MIN_AGE, MAX_AGE)) {
-      errors.applicant2_age = `Applicant 2 age is required for ${values.cover_type} cover — a whole number between ${MIN_AGE} and ${MAX_AGE}.`;
+      errors.applicant2_age = `Applicant 2 age is required for ${values.cover_type} cover - a whole number between ${MIN_AGE} and ${MAX_AGE}.`;
     }
     if (!COVER_HISTORIES.includes(values.applicant2_cover_history)) {
       errors.applicant2_cover_history = `Applicant 2 hospital cover history is required for ${values.cover_type} cover.`;
@@ -57,7 +48,7 @@ export function validateQuoteForm(values) {
   const discountText = String(values.annual_discount ?? '').trim();
   if (discountText === '') {
     if (values.payment_frequency === 'Yearly') {
-      errors.annual_discount = `Enter the annual discount (${MIN_DISCOUNT}–${MAX_DISCOUNT}%). Enter 0 for no discount.`;
+      errors.annual_discount = `Enter the annual discount (${MIN_DISCOUNT}-${MAX_DISCOUNT}%). Enter 0 for no discount.`;
     }
   } else {
     const d = Number(discountText);
@@ -73,7 +64,6 @@ export function validateQuoteForm(values) {
   return errors;
 }
 
-/** Convert form strings into the JSON types the API expects. */
 export function toPayload(values) {
   const twoAdults = needsApplicant2(values.cover_type);
   return {
@@ -91,7 +81,6 @@ export function toPayload(values) {
   };
 }
 
-/** Turn a saved database row back into form field strings. */
 export function toFormValues(quote) {
   return {
     customer_name: quote.customer_name ?? '',

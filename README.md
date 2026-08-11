@@ -1,15 +1,15 @@
-# HealthCoverSim — Private Health Insurance Quote Simulator
+# HealthCoverSim - Private Health Insurance Quote Simulator
 
 A small full-stack web application that simulates a private health insurance quote system.
 You can create, view, edit and delete quote records. For every quote the app calculates an
 estimated monthly and yearly premium from the cover type, hospital and extras cover,
 applicant ages, Lifetime Health Cover (LHC) loading, the family upgrade fee and the
-annual-payment discount — and explains every number in plain English.
+annual-payment discount - and explains every number in plain English.
 
 > **This is a learning simulator only.** It is not financial advice and does not reflect
 > any real insurer's pricing.
 
-**Subject:** CSE3CWA / CSE5006 — Cloud-Based Web Application Development
+**Subject:** CSE3CWA / CSE5006 - Cloud-Based Web Application Development
 **Assignment 1**
 
 ---
@@ -21,11 +21,11 @@ annual-payment discount — and explains every number in plain English.
 | Frontend | React 18 (Vite dev server) |
 | Backend  | Node.js + Express 4 |
 | Database | SQLite (`sqlite3` driver) |
-| Styling  | Plain hand-written CSS — no UI framework |
+| Styling  | Plain hand-written CSS - no UI framework |
 
 The frontend and backend are two separate projects that talk over a REST API, as taught in
 Week 4. Navigation uses plain React state and conditional rendering rather than a routing
-library, so the app only relies on concepts covered in Weeks 1–4.
+library, so the app only relies on concepts covered in Weeks 1-4.
 
 ---
 
@@ -42,7 +42,7 @@ port 5173. Open both terminals in the project root (the folder containing this R
 > version."* Use `;` instead of `&&` if you want one line, or use Command Prompt or
 > PowerShell 7+, where `&&` works normally.
 
-### Terminal 1 — backend
+### Terminal 1 - backend
 
 ```bash
 cd server
@@ -58,10 +58,10 @@ Database initialised at .../server/healthcoversim.db
 HealthCoverSim API listening on http://localhost:4000
 ```
 
-Quick check — open <http://localhost:4000/api/quotes> in a browser, or run
+Quick check - open <http://localhost:4000/api/quotes> in a browser, or run
 `curl http://localhost:4000/api/health`.
 
-### Terminal 2 — frontend
+### Terminal 2 - frontend
 
 ```bash
 cd client
@@ -78,7 +78,7 @@ The Vite dev server proxies every `/api/...` request through to `http://localhos
 
 ```bash
 cd server
-npm test           # 50 unit tests for the pricing engine — no server needed
+npm test           # 50 unit tests for the pricing engine - no server needed
 npm run test:api   # 63 end-to-end API tests, including every marker edge case
 ```
 
@@ -87,7 +87,7 @@ npm run test:api   # 63 end-to-end API tests, including every marker edge case
 | Problem | Fix |
 |---|---|
 | `The token '&&' is not a valid statement separator` | Windows PowerShell 5.1. Run each command on its own line, or use `;` instead of `&&`. |
-| `Cannot find module 'express'` | You skipped `npm install`, or you are in the wrong folder. `npm install` must be run **twice** — once in `server/` and once in `client/`. |
+| `Cannot find module 'express'` | You skipped `npm install`, or you are in the wrong folder. `npm install` must be run **twice** - once in `server/` and once in `client/`. |
 | `EADDRINUSE: address already in use :::4000` | Another copy of the backend is still running. Close the other terminal, or set a different port: `$env:PORT=4001; npm start` (PowerShell). |
 | `Could not reach the server` in the browser | The backend is not running. Start Terminal 1 first, then reload the React app. |
 | `no such table: quotes` | Run `npm run init-db` in `server/`. |
@@ -102,16 +102,16 @@ npm run test:api   # 63 end-to-end API tests, including every marker edge case
 
 The schema lives in **`server/init.sql`**. It creates a single `quotes` table with the
 columns listed in the assignment brief, plus `CHECK` constraints that mirror the
-application's validation rules (valid ages, valid cover tiers, discount 0–10%, and a
+application's validation rules (valid ages, valid cover tiers, discount 0-10%, and a
 constraint that applicant 2 must be present for Couple/Family and absent for Single).
 
 There are two ways to create the database:
 
 ```bash
-# Option A — the npm script (runs server/db.js, which executes init.sql)
+# Option A - the npm script (runs server/db.js, which executes init.sql)
 cd server && npm run init-db
 
-# Option B — the sqlite3 command line tool, if you have it installed
+# Option B - the sqlite3 command line tool, if you have it installed
 cd server && sqlite3 healthcoversim.db < init.sql
 ```
 
@@ -120,7 +120,7 @@ Section 7 worked example, so the marker can verify the figures immediately.
 
 `npm run init-db` **drops and recreates** the table, so it resets all data. If you simply
 run `npm start` without initialising first, `db.js` notices there is no `quotes` table and
-creates it automatically — the app will not crash on a fresh clone.
+creates it automatically - the app will not crash on a fresh clone.
 
 The database file itself is intentionally **not** committed (it is in `.gitignore`); the
 schema file is what gets committed.
@@ -129,7 +129,7 @@ schema file is what gets committed.
 
 ## 4. How the quote calculation works
 
-All the pricing logic lives in exactly one file — **`server/pricing.js`** — and the React
+All the pricing logic lives in exactly one file - **`server/pricing.js`** - and the React
 frontend never calculates a premium itself. The detail page asks the backend for the
 breakdown when it loads, so the number on the list page, the detail page and the API can
 never disagree.
@@ -147,14 +147,14 @@ never disagree.
 ### The formula
 
 ```
-hospital (per adult) = tier price × (1 + that adult's LHC loading)
+hospital (per adult) = tier price x (1 + that adult's LHC loading)
 hospital total       = sum over adults (1 for Single, 2 for Couple / Family)
-extras total         = extras tier price × adult count
+extras total         = extras tier price x adult count
 family fee           = $30 if Family, else $0
 
 monthly premium        = hospital total + extras total + family fee
-yearly before discount = monthly premium × 12
-yearly after discount  = yearly before × (1 − annual discount)   [Yearly only]
+yearly before discount = monthly premium x 12
+yearly after discount  = yearly before x (1 − annual discount)   [Yearly only]
 ```
 
 ### Lifetime Health Cover (LHC) loading
@@ -166,18 +166,18 @@ The loading is worked out per applicant from their hospital cover history:
 
 | Cover history | Loading | Notes |
 |---|---|---|
-| **Yes** — had cover before | 0% | No loading. |
-| **No** — never had cover | `(age − 30) × 2%` | Only when age > 30 **and** hospital cover is selected. If age ≤ 30, the loading is 0%. |
+| **Yes** - had cover before | 0% | No loading. |
+| **No** - never had cover | `(age − 30) x 2%` | Only when age > 30 **and** hospital cover is selected. If age ≤ 30, the loading is 0%. |
 | **Not sure** | 0% | The loading is never guessed. A per-applicant warning is displayed saying the quote may be inaccurate. |
 
-If hospital cover is **None**, no loading is applied at all — there is nothing to load.
+If hospital cover is **None**, no loading is applied at all - there is nothing to load.
 For Couple and Family cover each applicant's loading is calculated separately.
 
-*Example:* a 40-year-old with no prior cover → `(40 − 30) × 2% = 20%`.
+*Example:* a 40-year-old with no prior cover -> `(40 − 30) x 2% = 20%`.
 
 ### Monthly vs yearly
 
-The monthly premium × 12 is the yearly premium *before* discount. The annual-payment
+The monthly premium x 12 is the yearly premium *before* discount. The annual-payment
 discount is applied to that yearly total **only when the customer pays Yearly**. Monthly
 payers see their monthly premium and the yearly-before-discount figure, and are told
 explicitly that the discount has not been applied.
@@ -189,12 +189,12 @@ explicitly that the discount has not been applied.
 Family cover is priced as **two adults plus one flat $30/month upgrade fee**:
 
 1. Both adults are priced individually for hospital cover, each with **their own** LHC
-   loading — a 40-year-old with no prior cover and a 35-year-old who has held cover before
+   loading - a 40-year-old with no prior cover and a 35-year-old who has held cover before
    do not pay the same hospital premium.
-2. Extras cover is charged at the tier price × 2 adults, with **no** loading.
+2. Extras cover is charged at the tier price x 2 adults, with **no** loading.
 3. The **$30 family upgrade fee is added once**, not per adult and not per child.
 
-Children's ages are never entered and children are not priced individually — the flat fee
+Children's ages are never entered and children are not priced individually - the flat fee
 is what covers dependants. There is no couple or family discount: the only discount in the
 simulator is the annual-payment discount.
 
@@ -203,14 +203,14 @@ Applicant 1 age 40 / no history, Applicant 2 age 35 / history yes, paying yearly
 
 | Step | Result |
 |---|---|
-| Applicant 1 loading | (40 − 30) × 2% = 20% → $160 × 1.20 = **$192** |
-| Applicant 2 loading | history = Yes → 0% → **$160** |
+| Applicant 1 loading | (40 − 30) x 2% = 20% -> $160 x 1.20 = **$192** |
+| Applicant 2 loading | history = Yes -> 0% -> **$160** |
 | Hospital total | $192 + $160 = **$352** |
-| Extras total | $45 × 2 adults = **$90** |
+| Extras total | $45 x 2 adults = **$90** |
 | Family upgrade fee | **$30** |
 | **Monthly premium** | $352 + $90 + $30 = **$472** |
-| **Yearly before discount** | $472 × 12 = **$5,664** |
-| **Yearly after 5% discount** | $5,664 × 0.95 = **$5,380.80** |
+| **Yearly before discount** | $472 x 12 = **$5,664** |
+| **Yearly after 5% discount** | $5,664 x 0.95 = **$5,380.80** |
 
 This exact example is seeded into the database by `init.sql` and is asserted by the
 automated tests (`npm test`), so the figures can be verified in seconds.
@@ -221,17 +221,17 @@ automated tests (`npm test`), so the figures can be verified in seconds.
 
 The app refuses to produce a final quote from invalid data, and validates on **both** sides.
 
-**Frontend** (`client/src/validation.js`) — inline messages next to each field, focus jumps
+**Frontend** (`client/src/validation.js`) - inline messages next to each field, focus jumps
 to the first problem, and the live estimate disappears until the form is valid:
 
 - customer name required (max 100 characters)
 - cover type, hospital cover and extras cover must all be chosen
 - ages must be whole numbers from 18 to 100
 - Applicant 2 age and history are required whenever Couple or Family is selected
-- annual discount must be 0–10%; the field is disabled for monthly payers
+- annual discount must be 0-10%; the field is disabled for monthly payers
 - "Not sure" history is accepted but raises a warning that the quote may be inaccurate
 
-**Backend** (`server/validation.js`) — every route re-checks the same rules, because a user
+**Backend** (`server/validation.js`) - every route re-checks the same rules, because a user
 can send anything straight to the API. Invalid input returns **HTTP 400 with a per-field
 error object**, never a 500 crash. Malformed JSON, unknown cover tiers, a non-numeric age,
 a missing applicant 2, an out-of-range discount and an unknown quote id are all handled.
@@ -261,7 +261,7 @@ HealthCoverSim/
 ├── README.md
 ├── .gitignore
 ├── docs/
-│   ├── VIDEO-SCRIPT.md        # 3–5 minute demonstration script
+│   ├── VIDEO-SCRIPT.md        # 3-5 minute demonstration script
 │   └── MARKING-CHECKLIST.md   # every rubric line mapped to the code
 ├── server/                    # Node.js + Express + SQLite
 │   ├── server.js              # API routes
@@ -296,7 +296,7 @@ I used an AI assistant while building this project, in the way the brief permits
 
 **Where AI helped:**
 
-- Scaffolding boilerplate — the Express server setup, the promise wrappers around the
+- Scaffolding boilerplate - the Express server setup, the promise wrappers around the
   `sqlite3` callback API, and the initial CSS.
 - Suggesting the reusable `Field` / `TextInput` / `SelectInput` component pattern so that
   every form field gets a label and an error message without repeating markup.
@@ -306,7 +306,7 @@ I used an AI assistant while building this project, in the way the brief permits
 
 **What I did myself:**
 
-- Working out and writing the pricing rules in `pricing.js` — in particular the decision
+- Working out and writing the pricing rules in `pricing.js` - in particular the decision
   to calculate hospital per applicant (so each person's LHC loading is applied to their own
   premium) and to keep extras completely outside the loading calculation.
 - Deciding that the backend, not the frontend, owns the calculation, so the figures can
@@ -326,9 +326,9 @@ I can explain any line of the quote logic and walk through why each rule exists.
 
 **The LHC loading is uncapped and never expires.** The real Lifetime Health Cover scheme
 caps the loading at 70% and removes it entirely after 10 years of continuous hospital
-cover. This simulator applies the raw `(age − 30) × 2%` formula with no cap and no memory
+cover. This simulator applies the raw `(age − 30) x 2%` formula with no cap and no memory
 of how long someone has held cover, so a 100-year-old with no prior cover is quoted a 140%
-loading — a figure that could never occur in reality. The app also has no concept of the
+loading - a figure that could never occur in reality. The app also has no concept of the
 Australian Government Rebate, the Medicare Levy Surcharge, waiting periods, excess levels
 or state-based pricing, all of which materially affect a real premium. The figures here are
 for learning only and should not be compared against a real quote.
@@ -337,6 +337,6 @@ for learning only and should not be compared against a real quote.
 
 ## 11. Submission notes
 
-- The database file is not committed — run `npm run init-db` after cloning.
+- The database file is not committed - run `npm run init-db` after cloning.
 - `node_modules` and `dist` are excluded via `.gitignore` and from the submitted ZIP.
 - See `docs/VIDEO-SCRIPT.md` for the demonstration walkthrough.

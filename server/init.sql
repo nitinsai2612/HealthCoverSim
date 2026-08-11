@@ -1,5 +1,5 @@
 -- ============================================================
--- HealthCoverSim — database schema
+-- HealthCoverSim - database schema
 -- Run with:  sqlite3 healthcoversim.db < init.sql
 -- (or simply: npm run init-db, which executes this file via db.js)
 -- ============================================================
@@ -14,7 +14,7 @@ CREATE TABLE quotes (
   applicant1_age            INTEGER NOT NULL CHECK (applicant1_age BETWEEN 18 AND 100),
   applicant1_cover_history  TEXT    NOT NULL CHECK (applicant1_cover_history IN ('Yes', 'No', 'Not sure')),
 
-  -- NULL for Single cover — the backend performs null checks before use.
+  -- NULL for Single cover - the backend performs null checks before use.
   applicant2_age            INTEGER          CHECK (applicant2_age IS NULL OR applicant2_age BETWEEN 18 AND 100),
   applicant2_cover_history  TEXT             CHECK (applicant2_cover_history IS NULL OR applicant2_cover_history IN ('Yes', 'No', 'Not sure')),
 

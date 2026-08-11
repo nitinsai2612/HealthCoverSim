@@ -1,9 +1,3 @@
-/*
- * QuoteForm.jsx — used for BOTH creating a new quote and editing an existing one.
- * Applicant 2 fields are rendered only when Couple or Family is selected
- * (React conditional rendering).
- */
-
 import { useEffect, useState } from 'react';
 import { Field, TextInput, NumberInput, SelectInput, RadioGroup, TextArea } from './FormField.jsx';
 import ExplanationSheet from './ExplanationSheet.jsx';
@@ -25,7 +19,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
   const twoAdults = needsApplicant2(values.cover_type);
   const isYearly = values.payment_frequency === 'Yearly';
 
-  // Update one field and clear its error as soon as the user edits it.
   const setField = (name) => (value) => {
     setValues((prev) => ({ ...prev, [name]: value }));
     setErrors((prev) => {
@@ -35,13 +28,10 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
     });
   };
 
-  // Re-validate live once the user has tried to submit at least once.
   useEffect(() => {
     if (touched) setErrors(validateQuoteForm(values));
   }, [values, touched]);
 
-  // Live preview: whenever the form is valid, ask the backend for the figures.
-  // This keeps ONE copy of the pricing logic (on the server).
   useEffect(() => {
     const problems = validateQuoteForm(values);
     if (Object.keys(problems).length > 0) {
@@ -63,7 +53,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
     const problems = validateQuoteForm(values);
     setErrors(problems);
     if (Object.keys(problems).length > 0) {
-      // Move focus to the first problem so the user can see it.
       const firstField = document.getElementById(Object.keys(problems)[0]);
       if (firstField) firstField.focus();
       return;
@@ -76,7 +65,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
     }
   };
 
-  // Server-side field errors take priority (they are the authoritative check).
   const errorFor = (name) => submitFieldErrors[name] || errors[name];
 
   return (
@@ -90,7 +78,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
 
         {submitError && <div className="alert alert--error" role="alert">{submitError}</div>}
 
-        {/* ---- Customer ------------------------------------------------- */}
         <fieldset className="group">
           <legend>Customer</legend>
 
@@ -117,7 +104,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
           </Field>
         </fieldset>
 
-        {/* ---- Applicant 1 ---------------------------------------------- */}
         <fieldset className="group">
           <legend>Applicant 1</legend>
 
@@ -129,7 +115,7 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
               error={errorFor('applicant1_age')}
               min={MIN_AGE}
               max={MAX_AGE}
-              placeholder={`${MIN_AGE}–${MAX_AGE}`}
+              placeholder={`${MIN_AGE}-${MAX_AGE}`}
             />
           </Field>
 
@@ -150,7 +136,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
           </Field>
         </fieldset>
 
-        {/* ---- Applicant 2: CONDITIONAL RENDERING ----------------------- */}
         {twoAdults && (
           <fieldset className="group group--conditional">
             <legend>Applicant 2 <span className="badge">required for {values.cover_type}</span></legend>
@@ -163,7 +148,7 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
                 error={errorFor('applicant2_age')}
                 min={MIN_AGE}
                 max={MAX_AGE}
-                placeholder={`${MIN_AGE}–${MAX_AGE}`}
+                placeholder={`${MIN_AGE}-${MAX_AGE}`}
               />
             </Field>
 
@@ -184,7 +169,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
           </fieldset>
         )}
 
-        {/* ---- Cover levels --------------------------------------------- */}
         <fieldset className="group">
           <legend>Cover levels</legend>
 
@@ -221,7 +205,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
           </Field>
         </fieldset>
 
-        {/* ---- Payment --------------------------------------------------- */}
         <fieldset className="group">
           <legend>Payment</legend>
 
@@ -239,8 +222,8 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
             htmlFor="annual_discount"
             error={errorFor('annual_discount')}
             hint={isYearly
-              ? `${MIN_DISCOUNT}–${MAX_DISCOUNT}% (3–8% typical). Enter 0 for no discount.`
-              : 'Only applied when paying Yearly — this value is ignored for monthly payers.'}
+              ? `${MIN_DISCOUNT}-${MAX_DISCOUNT}% (3-8% typical). Enter 0 for no discount.`
+              : 'Only applied when paying Yearly - this value is ignored for monthly payers.'}
           >
             <NumberInput
               id="annual_discount"
@@ -255,7 +238,6 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
           </Field>
         </fieldset>
 
-        {/* ---- Notes ------------------------------------------------------ */}
         <fieldset className="group">
           <legend>Notes (optional)</legend>
           <Field label="Notes" htmlFor="notes" error={errorFor('notes')} hint="Anything you want to remember about this quote.">
@@ -265,13 +247,12 @@ export default function QuoteForm({ mode = 'create', initialValues = EMPTY_QUOTE
 
         <div className="actions">
           <button type="submit" className="btn btn--primary" disabled={saving}>
-            {saving ? 'Saving…' : mode === 'edit' ? 'Save changes' : 'Create quote'}
+            {saving ? 'Saving...' : mode === 'edit' ? 'Save changes' : 'Create quote'}
           </button>
           <button type="button" className="btn" onClick={onCancel}>Cancel</button>
         </div>
       </form>
 
-      {/* ---- Live preview ------------------------------------------------ */}
       <aside className="preview">
         {preview ? (
           <ExplanationSheet breakdown={preview} />

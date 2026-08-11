@@ -1,15 +1,5 @@
-/*
- * api.js — every call to the Express backend lives here.
- * Requests go to /api/... and Vite proxies them to http://localhost:4000.
- */
-
 const BASE = '/api';
 
-/**
- * Shared fetch wrapper.
- * Turns a backend error response into a thrown Error that carries the
- * per-field `errors` object, so forms can show messages next to each field.
- */
 async function request(path, options = {}) {
   let response;
   try {

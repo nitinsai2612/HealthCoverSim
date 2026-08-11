@@ -1,13 +1,7 @@
-/*
- * QuoteDetail.jsx — the detail page: the saved inputs plus the explanation sheet.
- * The premium is calculated by the backend when this page loads, so the logic
- * lives in exactly one place.
- */
-
 import ExplanationSheet from './ExplanationSheet.jsx';
 
 export default function QuoteDetail({ quote, breakdown, loading, error, onBack, onEdit, onDelete }) {
-  if (loading) return <div className="card"><p>Loading quote…</p></div>;
+  if (loading) return <div className="card"><p>Loading quote...</p></div>;
 
   if (error) {
     return (
@@ -53,10 +47,10 @@ export default function QuoteDetail({ quote, breakdown, loading, error, onBack, 
               <th scope="row">Annual-payment discount</th>
               <td>
                 {quote.annual_discount}%
-                {quote.payment_frequency === 'Monthly' && <span className="muted"> — not applied, this customer pays monthly</span>}
+                {quote.payment_frequency === 'Monthly' && <span className="muted"> - not applied, this customer pays monthly</span>}
               </td>
             </tr>
-            <tr><th scope="row">Notes</th><td>{quote.notes ? quote.notes : <span className="muted">—</span>}</td></tr>
+            <tr><th scope="row">Notes</th><td>{quote.notes ? quote.notes : <span className="muted">-</span>}</td></tr>
             <tr><th scope="row">Created</th><td>{quote.created_at}</td></tr>
           </tbody>
         </table>

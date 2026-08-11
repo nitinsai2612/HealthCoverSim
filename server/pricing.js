@@ -1,20 +1,7 @@
-/*
- * pricing.js — HealthCoverSim quote calculation engine
- * ----------------------------------------------------
- * All pricing logic lives in this ONE file so the numbers can never
- * disagree between the list page, the detail page and the API.
- *
- * Rules implemented (Assignment Section 5 & 6):
- *   hospital (per adult) = tier price x (1 + that adult's LHC loading)
- *   hospital total       = sum over adults (1 for Single, 2 for Couple/Family)
- *   extras total         = extras tier price x adult count
- *   family fee           = $30 if Family, else $0
- *   monthly premium      = hospital total + extras total + family fee
- *   yearly before disc.  = monthly premium x 12
- *   yearly after disc.   = yearly before x (1 - annual discount)   [Yearly only]
- */
+// Quote calculation engine. All pricing logic lives here.
 
-// ---- Price tables (per adult, per month) --------------------------------
+// Price tables (per adult, per month)
+
 const HOSPITAL_PRICES = {
   None: 0,
   Basic: 90,
@@ -30,40 +17,28 @@ const EXTRAS_PRICES = {
   Premium: 70,
 };
 
-const FAMILY_UPGRADE_FEE = 30; // per month, flat, Family only
+const FAMILY_UPGRADE_FEE = 30;
 
 const ADULT_COUNT = {
   Single: 1,
   Couple: 2,
-  Family: 2, // 2 adults + the flat family fee; children are not priced individually
+  Family: 2,
 };
 
-// The exact statement the assignment requires on every explanation sheet.
 const LHC_STATEMENT =
   'Lifetime Health Cover loading applies only to hospital cover. It does not apply to extras cover.';
 
-// ---- Helpers -------------------------------------------------------------
+// Helpers
 
-/** Round to 2 decimal places, avoiding floating point drift (5380.799999 -> 5380.8). */
 function round2(value) {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 }
 
-/**
- * Lifetime Health Cover loading for ONE applicant, as a decimal (0.20 = 20%).
- *
- *   history "Yes"      -> 0%  (they already held cover)
- *   history "No"       -> (age - 30) x 2%, ONLY if age > 30
- *   history "Not sure" -> 0%  (never guess) + a warning is raised
- *   hospital = "None"  -> 0%  (there is no hospital premium to load)
- */
 function calculateLhcLoading(age, coverHistory, hospitalCover) {
-  // No hospital cover selected => nothing to load. This also guarantees that
-  // an extras-only quote is never loaded.
   if (!hospitalCover || hospitalCover === 'None') return 0;
 
   if (coverHistory === 'Yes') return 0;
-  if (coverHistory === 'Not sure') return 0; // do not auto-apply; warn instead
+  if (coverHistory === 'Not sure') return 0;
 
   if (coverHistory === 'No') {
     const numericAge = Number(age);
@@ -75,15 +50,8 @@ function calculateLhcLoading(age, coverHistory, hospitalCover) {
   return 0;
 }
 
-// ---- Main calculation ----------------------------------------------------
+// Main calculation
 
-/**
- * Build the full premium breakdown for a quote record.
- * Assumes the record has already passed validation.
- *
- * @param {object} quote - the stored quote row / form values
- * @returns {object} breakdown used by the explanation sheet
- */
 function calculateQuote(quote) {
   const coverType = quote.cover_type;
   const hospitalCover = quote.hospital_cover;
@@ -94,7 +62,7 @@ function calculateQuote(quote) {
   const hospitalBase = HOSPITAL_PRICES[hospitalCover] ?? 0;
   const extrasBase = EXTRAS_PRICES[extrasCover] ?? 0;
 
-  // --- Per-applicant hospital premium (LHC loading applies here only) -----
+  // Per-applicant hospital premium. LHC loading applies here only.
   const applicants = [];
   const warnings = [];
 
@@ -109,19 +77,20 @@ function calculateQuote(quote) {
       applicant: i,
       age,
       coverHistory: history,
-      lhcLoadingPercent: round2(loading * 100), // e.g. 20 means 20%
+      lhcLoadingPercent: round2(loading * 100),
       hospitalBasePrice: round2(hospitalBase),
       hospitalPremium: premium,
     });
 
     if (history === 'Not sure') {
       warnings.push(
-        `Applicant ${i}: Cover history is unknown — LHC loading has not been applied. This quote may be inaccurate.`
+        `Applicant ${i}: Cover history is unknown. LHC loading has not been applied. This quote may be inaccurate.`
       );
     }
   }
 
-  // --- Totals -------------------------------------------------------------
+  // Totals
+
   const hospitalTotal = round2(applicants.reduce((sum, a) => sum + a.hospitalPremium, 0));
   const extrasTotal = round2(extrasBase * adultCount);
   const familyUpgradeFee = coverType === 'Family' ? FAMILY_UPGRADE_FEE : 0;
@@ -129,7 +98,8 @@ function calculateQuote(quote) {
   const monthlyPremium = round2(hospitalTotal + extrasTotal + familyUpgradeFee);
   const yearlyBeforeDiscount = round2(monthlyPremium * 12);
 
-  // --- Annual discount: ONLY when paying Yearly ---------------------------
+  // Annual discount applies only when paying Yearly
+
   const isYearly = paymentFrequency === 'Yearly';
   const discountPercent = isYearly ? Number(quote.annual_discount) || 0 : 0;
   const discountAmount = isYearly ? round2(yearlyBeforeDiscount * (discountPercent / 100)) : 0;
@@ -137,7 +107,6 @@ function calculateQuote(quote) {
     ? round2(yearlyBeforeDiscount * (1 - discountPercent / 100))
     : null;
 
-  // The single figure the customer actually pays.
   const finalTotal = isYearly ? yearlyAfterDiscount : monthlyPremium;
 
   return {
