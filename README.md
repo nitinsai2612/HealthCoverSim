@@ -260,9 +260,6 @@ All SQL uses parameterised queries, so quote text in a customer name cannot brea
 HealthCoverSim/
 ├── README.md
 ├── .gitignore
-├── docs/
-│   ├── VIDEO-SCRIPT.md        # 3-5 minute demonstration script
-│   └── MARKING-CHECKLIST.md   # every rubric line mapped to the code
 ├── server/                    # Node.js + Express + SQLite
 │   ├── server.js              # API routes
 │   ├── pricing.js             # THE quote calculation engine (single source of truth)
@@ -339,4 +336,3 @@ for learning only and should not be compared against a real quote.
 
 - The database file is not committed - run `npm run init-db` after cloning.
 - `node_modules` and `dist` are excluded via `.gitignore` and from the submitted ZIP.
-- See `docs/VIDEO-SCRIPT.md` for the demonstration walkthrough.
