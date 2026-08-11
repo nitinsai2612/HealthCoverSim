@@ -34,7 +34,13 @@ library, so the app only relies on concepts covered in Weeks 1–4.
 You need **Node.js 18 or newer** (check with `node -v`) and npm.
 
 The app runs as **two terminals**: the backend API on port 4000 and the React frontend on
-port 5173.
+port 5173. Open both terminals in the project root (the folder containing this README).
+
+> **Windows PowerShell users:** run each command on its own line, exactly as shown below.
+> Windows PowerShell 5.1 does not support the `&&` separator, so chaining the commands onto
+> a single line fails with *"The token '&&' is not a valid statement separator in this
+> version."* Use `;` instead of `&&` if you want one line, or use Command Prompt or
+> PowerShell 7+, where `&&` works normally.
 
 ### Terminal 1 — backend
 
@@ -75,6 +81,20 @@ cd server
 npm test           # 50 unit tests for the pricing engine — no server needed
 npm run test:api   # 63 end-to-end API tests, including every marker edge case
 ```
+
+### Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| `The token '&&' is not a valid statement separator` | Windows PowerShell 5.1. Run each command on its own line, or use `;` instead of `&&`. |
+| `Cannot find module 'express'` | You skipped `npm install`, or you are in the wrong folder. `npm install` must be run **twice** — once in `server/` and once in `client/`. |
+| `EADDRINUSE: address already in use :::4000` | Another copy of the backend is still running. Close the other terminal, or set a different port: `$env:PORT=4001; npm start` (PowerShell). |
+| `Could not reach the server` in the browser | The backend is not running. Start Terminal 1 first, then reload the React app. |
+| `no such table: quotes` | Run `npm run init-db` in `server/`. |
+| `npm install` fails while building `sqlite3` | The `sqlite3` package compiles a small native module. On Windows this normally uses a prebuilt binary and needs no setup; if it fails, check you are on Node.js 18+ and that you have a working internet connection. |
+
+> Note: `npm run init-db` **drops and recreates** the table, which deletes any quotes you
+> have saved. Run it once at the start; you do not need it again unless you want to reset.
 
 ---
 
