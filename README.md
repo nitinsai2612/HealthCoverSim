@@ -11,6 +11,15 @@ annual-payment discount - and explains every number in plain English.
 
 **Subject:** CSE3CWA / CSE5006 - Cloud-Based Web Application Development
 **Assignment 1**
+**Student:** Nitin Sai
+
+## Submission
+
+| Item | Where |
+|---|---|
+| GitHub repository | https://github.com/nitinsai2612/HealthCoverSim |
+| Source code ZIP | Uploaded to LMS (excludes `node_modules` and build folders) |
+| Demonstration video | Uploaded to LMS |
 
 ---
 
